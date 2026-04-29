@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mini Kari - Asset Engine</title>
+    <style>
+        :root {
+            --ease-vanguard: cubic-bezier(0.32, 0.72, 0, 1);
+        }
+
+        body {
+            background-color: #0A0C10;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* WRAPPER: 300x300, squircle */
+        .kari-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            border-radius: 66px;
+            overflow: hidden;
+            animation: float 4.5s ease-in-out infinite;
+        }
+
+        /* LAYER STACK */
+        .layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        #layer-fondo {
+            z-index: 1;
+            background-image: url('public/assets/minikari/fondo.png');
+        }
+
+        #layer-cuerpo {
+            z-index: 2;
+            background-image: url('public/assets/minikari/cuerpo.png');
+            animation: 
+                breathe 3.5s ease-in-out infinite,
+                glow 3.5s ease-in-out infinite;
+        }
+
+        #layer-ojos {
+            z-index: 3;
+            background-image: url('public/assets/minikari/ojos.png');
+            transform-origin: center center;
+        }
+
+        /* ANIMATIONS */
+        @keyframes breathe {
+            0%, 100% { transform: scale(1) translateY(0px); opacity: 0.93; }
+            50% { transform: scale(1.03) translateY(-3px); opacity: 1; }
+        }
+
+        @keyframes glow {
+            0%, 100% { filter: brightness(0.95) drop-shadow(0 0 8px rgba(100,200,255,0.3)); }
+            50% { filter: brightness(1.05) drop-shadow(0 0 20px rgba(100,200,255,0.6)); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-6px); }
+        }
+
+        /* BLINK CLASS */
+        .blink {
+            animation: blink-anim 0.2s var(--ease-vanguard);
+        }
+
+        @keyframes blink-anim {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.04); }
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 30px;
+            color: rgba(255,255,255,0.1);
+            font-size: 9px;
+            letter-spacing: 0.5em;
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="kari-container" id="kari-wrapper">
+        <div id="layer-fondo" class="layer"></div>
+        <div id="layer-cuerpo" class="layer"></div>
+        <div id="layer-ojos" class="layer"></div>
+    </div>
+
+    <div class="footer">Mini Kari . Asset Animation Engine</div>
+
+    <script>
+        const wrapper = document.getElementById('kari-wrapper');
+        const layerOjos = document.getElementById('layer-ojos');
+        const layerCuerpo = document.getElementById('layer-cuerpo');
+        
+        const assets = {
+            fondo: 'public/assets/minikari/fondo.png',
+            cuerpo: 'public/assets/minikari/cuerpo.png',
+            ojos: 'public/assets/minikari/ojos.png',
+            idle: 'public/assets/minikari/mini-kari-01.png',
+            right: 'public/assets/minikari/mini-kari-02.png',
+            left: 'public/assets/minikari/mini-kari-03.png',
+            up: 'public/assets/minikari/mini-kari-04.png',
+            down: 'public/assets/minikari/mini-kari-05.png'
+        };
+
+        // Preload
+        Object.values(assets).forEach(src => {
+            const img = new Image();
+            img.src = src;
+        });
+
+        let mouseX = 0;
+        let mouseY = 0;
+        let currentX = 0;
+        let currentY = 0;
+        let isSwapped = false;
+
+        const updateTarget = (e) => {
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            const rect = wrapper.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            mouseX = clientX - centerX;
+            mouseY = clientY - centerY;
+        };
+
+        window.addEventListener('mousemove', updateTarget);
+        window.addEventListener('touchmove', (e) => {
+            updateTarget(e);
+            e.preventDefault();
+        }, { passive: false });
+
+        function animate() {
+            // LERP
+            currentX += (mouseX - currentX) * 0.1;
+            currentY += (mouseY - currentY) * 0.1;
+            
+            const dist = Math.sqrt(currentX * currentX + currentY * currentY);
+            
+            if (dist < 60) {
+                // NEUTRAL ZONE: Use ojos.png + translate
+                if (isSwapped) {
+                    layerOjos.style.backgroundImage = `url(${assets.ojos})`;
+                    layerCuerpo.style.opacity = "1"; // Ensure body is visible if it was hidden by frames
+                    isSwapped = false;
+                }
+                const tx = (currentX / 60) * 8;
+                const ty = (currentY / 60) * 6;
+                layerOjos.style.transform = `translate(${tx}px, ${ty}px)`;
+            } else {
+                // ACTION ZONE: Frame Swap
+                isSwapped = true;
+                const angle = Math.atan2(currentY, currentX) * (180 / Math.PI);
+                
+                let activeFrame = assets.idle;
+                if (angle >= -45 && angle <= 45) activeFrame = assets.right;
+                else if (angle > 135 || angle < -135) activeFrame = assets.left;
+                else if (angle > -135 && angle < -45) activeFrame = assets.up;
+                else if (angle > 45 && angle <= 135) activeFrame = assets.down;
+                
+                layerOjos.style.backgroundImage = `url(${activeFrame})`;
+                
+                // Extra soft translate even in frame mode
+                const tx = (currentX / Math.abs(currentX)) * 2;
+                const ty = (currentY / Math.abs(currentY)) * 2;
+                layerOjos.style.transform = `translate(${tx}px, ${ty}px)`;
+            }
+            
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // BLINK (Only if not swapped)
+        function triggerBlink() {
+            if (!isSwapped) {
+                layerOjos.classList.add('blink');
+                setTimeout(() => {
+                    layerOjos.classList.remove('blink');
+                }, 200);
+            }
+            
+            const nextBlink = 3000 + Math.random() * 3000;
+            setTimeout(triggerBlink, nextBlink);
+        }
+        setTimeout(triggerBlink, 3000);
+    </script>
+</body>
+</html>

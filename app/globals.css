@@ -1,26 +1,147 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-background: #000000;
+  --color-foreground: #ffffff;
+  --color-accent: #00A3FF;
+  --color-indigo-glow: #2365FF;
+  --font-apple: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #000000;
+    --foreground: #ffffff;
+    --ease-vanguard: cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-apple);
+    -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.015em;
+    overflow-x: hidden;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer components {
+  /* THE "INNER SHADOW 4" BACKGROUND EFFECT */
+  .vanguard-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: black;
+    overflow: hidden;
+  }
+
+  .vanguard-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    /* Replicating the Inner Shadow 4 Look (Bottom Glow) */
+    box-shadow: inset 0 -300px 300px -150px rgba(35, 101, 255, 0.15);
+    pointer-events: none;
+  }
+
+  /* REFINED DOUBLE-BEZEL (SUBTLE) */
+  .bezel-outer {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    padding: 0.375rem;
+    border-radius: 2.25rem;
+    transition: all 0.5s var(--ease-vanguard);
+  }
+
+  .bezel-outer:hover {
+    background: rgba(0, 163, 255, 0.05);
+    border-color: rgba(0, 163, 255, 0.2);
+    transform: translateY(-2px);
+  }
+
+  .bezel-inner {
+    background: rgba(255, 255, 255, 0.01);
+    border: 1px solid rgba(255, 255, 255, 0.02);
+    border-radius: calc(2.25rem - 0.375rem);
+    backdrop-filter: blur(40px) saturate(180%);
+    box-shadow: inset 0 6px 6px -2px rgba(35, 101, 255, 0.15); /* Exact Reference Applied */
+  }
+
+  /* INDIGO SPLIT PILL BUTTON (REF: NEW) */
+  .liquid-island {
+    background: linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%);
+    backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    transition: all 0.5s var(--ease-vanguard);
+    position: relative;
+    box-shadow: 0 10px 40px rgba(79, 70, 229, 0.3);
+    overflow: hidden;
+  }
+
+  .liquid-content {
+    padding: 0.75rem 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .liquid-arrow {
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+  }
+
+  .liquid-island:hover {
+    transform: translateY(-3px) scale(1.03);
+    box-shadow: 0 15px 50px rgba(79, 70, 229, 0.4);
+    filter: brightness(1.1);
+  }
+
+  .liquid-island:hover .liquid-arrow {
+    opacity: 1;
+  }
+
+  .liquid-island:active {
+    transform: scale(0.96);
+  }
+
+  .icon-square {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+  }
+
+  /* MINI KARI ANIMATIONS */
+  @keyframes vanguard-breathe-glow {
+    0%, 100% { 
+      transform: scale(1) translateY(0px); 
+      filter: brightness(0.95) drop-shadow(0 0 10px rgba(0, 163, 255, 0.2)); 
+    }
+    50% { 
+      transform: scale(1.04) translateY(-4px); 
+      filter: brightness(1.1) drop-shadow(0 0 25px rgba(0, 163, 255, 0.4)); 
+    }
+  }
+
+  @keyframes vanguard-float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .input-glow {
+    @apply w-full bg-transparent border-b border-white/5 py-6 text-3xl font-extralight outline-none focus:border-white/10 transition-all placeholder:text-white/5;
+  }
 }
