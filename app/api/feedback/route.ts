@@ -5,11 +5,7 @@ import { createServerClient } from '@/lib/supabase/server'
 const resend = new Resend(process.env.RESEND_API_KEY)
 
 const RECIPIENTS = [
-  'rrhh@garabato.com.py',
-  'mauricio@garabato.com.py',
-  'paloma@garabato.com.py',
-  'renzo@garabato.com.py',
-  'betania@garabato.com.py'
+  'palocella@garabato.com.py'
 ]
 
 export async function POST(req: Request) {
