@@ -16,7 +16,10 @@ export const metadata: Metadata = {
   title: "Agency Pulse | Garabato",
   description: "Plataforma de cultura y feedback de Garabato Creative Agency",
   icons: {
-    icon: "/icon.png",
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/icon.png", type: "image/png" }
+    ],
     apple: "/icon.png",
   },
   openGraph: {
