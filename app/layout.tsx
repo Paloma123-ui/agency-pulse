@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Agency Pulse | Garabato",
-  description: "Plataforma de cultura y feedback de Garabato Creative Agency",
+  title: "Hola soy Mini Kari",
+  description: "Tu asistente IA de recursos humanos",
   icons: {
     icon: [
       { url: "/favicon.ico" },
@@ -23,8 +23,15 @@ export const metadata: Metadata = {
     apple: "/icon.png",
   },
   openGraph: {
-    title: "Agency Pulse | Garabato",
-    description: "Plataforma de cultura y feedback de Garabato Creative Agency",
+    title: "Hola soy Mini Kari",
+    description: "Tu asistente IA de recursos humanos",
+    images: ["/icon.png"],
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Hola soy Mini Kari",
+    description: "Tu asistente IA de recursos humanos",
     images: ["/icon.png"],
   }
 };
